@@ -11,7 +11,7 @@ import base64
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.errors import ListenerCanceled
-from database.database import *
+
 from config import *
 
 BATCH = []
@@ -86,27 +86,13 @@ __🚸 Pᴏʀɴ Cᴏɴᴛᴇɴᴛ Nᴏᴛ Aʟʟᴏᴡᴇᴅ Oɴ Tʜᴇ Bᴏᴛ__
             return await send_msg.edit(f"🥴 Sᴏʀʀʏ ʙʀᴏ ʏᴏᴜʀ ғɪʟᴇ ᴡᴀs ᴅᴇʟᴇᴛᴇᴅ ʙʏ ғɪʟᴇ ᴏᴡɴᴇʀ ᴏʀ ʙᴏᴛ ᴏᴡɴᴇʀ\n\nFᴏʀ ᴍᴏʀᴇ ʜᴇʟᴘ ᴄᴏɴᴛᴀᴄᴛ ᴍʏ ᴏᴡɴᴇʀ 👉 {owner.mention(style='md')}")
         
         caption = f"{msg.caption.markdown}\n\n\n" if msg.caption else ""
-        as_uploadername = (await get_data(str(chat_id))).up_name
-        
-        if as_uploadername:
-            if chat_id.startswith('-100'):
-                channel = await c.get_chat(int(chat_id))
-                caption += "\n\n\n**--Uᴘʟᴏᴀᴅᴇʀ Dᴇᴛᴀɪʟs:--**\n\n"
-                caption += f"**📢 Cʜᴀɴɴᴇʟ Nᴀᴍᴇ:** __{channel.title}__\n\n"
-                caption += f"**🗣 Usᴇʀ Nᴀᴍᴇ:** @{channel.username}\n\n" if channel.username else ""
-                caption += f"**👤 Cʜᴀɴɴᴇʟ Iᴅ:** __{channel.id}__\n\n"
-            else:
-                user = await c.get_users(int(chat_id)) 
-                caption += "\n\n\n**--Uᴘʟᴏᴀᴅᴇʀ Dᴇᴛᴀɪʟs:--**\n\n"
-                caption += f"**🍁 Nᴀᴍᴇ:** [{user.from_user.first_name}](tg://user?id={user.from_user.id})\n\n"
-                caption += f"**🖋 Usᴇʀ Nᴀᴍᴇ:** @{user.username}\n\n" if user.username else ""
-
-
+        user = await c.get_users(int(chat_id)) 
+        caption += "\n\n\n**--Uᴘʟᴏᴀᴅᴇʀ Dᴇᴛᴀɪʟs:--**\n\n"
+        caption += f"**🍁 Nᴀᴍᴇ:** [{user.from_user.first_name}](tg://user?id={user.from_user.id})\n\n"
+        caption += f"**🖋 Usᴇʀ Nᴀᴍᴇ:** @{user.username}\n\n" if user.username else ""
         await send_msg.delete()
         await msg.copy(m.from_user.id, caption=caption)
-
-
-    else: # sending start message
+    else:
         await send_msg.edit(
             text=text,
             reply_markup=InlineKeyboardMarkup(buttons)
@@ -177,22 +163,6 @@ async def batch(c, m):
 
     await message.edit(text=url)
 
-@Client.on_message(filters.command('mode') & filters.incoming & filters.private)
-async def set_mode(c,m):
-    if IS_PRIVATE:
-        if m.from_user.id not in AUTH_USERS:
-            return
-    usr = m.from_user.id
-    if len(m.command) > 1:
-        usr = m.command[1]
-    caption_mode = (await get_data(usr)).up_name
-    if caption_mode:
-       await update_as_name(str(usr), False)
-       text = "Uᴘʟᴏᴀᴅᴇʀ Dᴇᴛᴀɪʟs ɪɴ Cᴀᴘᴛɪᴏɴ: **Dɪsᴀʙʟᴇᴅ ❌**"
-    else:
-       await update_as_name(str(usr), True)
-       text = "Uᴘʟᴏᴀᴅᴇʀ Dᴇᴛᴀɪʟs ɪɴ Cᴀᴘᴛɪᴏɴ: **Eɴᴀʙʟᴇᴅ ✔️**"
-    await m.reply_text(text, quote=True)
 
 async def decode(base64_string):
     base64_bytes = base64_string.encode("ascii")
